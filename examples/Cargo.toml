@@ -1,0 +1,12 @@
+[package]
+name = "ucdf-examples"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[[example]]
+name = "examples"
+path = "examples.rs"
+
+[dependencies]
+ucdf = { path = ".." }
