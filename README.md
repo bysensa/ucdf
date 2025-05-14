@@ -38,13 +38,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Parse a UCDF string
     let ucdf_str = "t=file.csv;c.path=/data/users.csv;s.fields=id:int,name:str;a=r";
     let ucdf = ucdf::parse(ucdf_str)?;
-    
+
     println!("Source type: {}", ucdf.source_type);
     println!("Path: {}", ucdf.connection.get("path").unwrap_or(&"".to_string()));
-    
+
     // Create a UCDF string programmatically
     let source_type = SourceType::new("db".to_string(), Some("postgresql".to_string()));
-    let ucdf = UCDF::new(source_type)
+    let ucdf = UCDF::with_source_type(source_type)
         .with_connection("host", "localhost")
         .with_connection("port", "5432")
         .with_connection("db", "myapp")
@@ -53,11 +53,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Field::new("name".to_string(), "str".to_string(), None),
         ])
         .with_access_mode(AccessMode::ReadWrite);
-    
+
     // Convert back to string
     let ucdf_str = ucdf.to_string();
     println!("UCDF: {}", ucdf_str);
-    
+
     Ok(())
 }
 ```
@@ -75,38 +75,46 @@ t=<type>;[c.<param>=<value>];[s.<structure>=<description>];[a=<access>];[m.<meta
 ### Section Types
 
 - **Type (`t`)**: Defines the data source type (required)
+
   - Example: `t=file.csv`, `t=db.postgresql`, `t=api.rest`
-  
+
 - **Connection (`c`)**: Connection parameters
+
   - Example: `c.path=/data/users.csv`, `c.host=localhost`
-  
+
 - **Structure (`s`)**: Data structure or schema
+
   - Example: `s.fields=id:int,name:str`, `s.endpoints=/users:GET`
-  
+
 - **Access (`a`)**: Access mode
+
   - Values: `r` (read), `w` (write), `rw` (read-write)
-  
+
 - **Metadata (`m`)**: Additional information
   - Example: `m.desc=User data`, `m.owner=admin`
 
 ### Examples
 
 #### CSV File
+
 ```
 t=file.csv;c.path=/data/users.csv;s.fields=id:int,name:str,email:str;a=r;m.desc=User data
 ```
 
 #### PostgreSQL Database
+
 ```
 t=db.postgresql;c.host=db.prod;c.user=readonly;c.db=sales;s.fields=id:int,amount:float,date:date;a=r
 ```
 
 #### REST API
+
 ```
 t=api.rest;c.url=https://api.example.com;c.auth.type=bearer;c.auth.token=xyz;s.endpoints=/users:GET,/orders:POST;a=rw
 ```
 
 #### Kafka Stream
+
 ```
 t=stream.kafka;c.brokers=broker1:9092,broker2:9092;c.topic=events;s.format=json;s.fields=event_id:str,payload:json;a=r
 ```
